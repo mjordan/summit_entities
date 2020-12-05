@@ -1,0 +1,31 @@
+<?php
+
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_entity_presave().
+ */
+function summit_entities_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
+  if ($entity->getEntityTypeId() == 'taxonomy_term' && $entity->bundle() == 'author') {
+    $entity->set('field_given_name', 'i am a given name');
+    $entity->set('field_last_name', 'i am a last name');
+  }
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function summit_entities_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
+  // Create an author page, assigning ownership to the new user.
+  if ($entity->getEntityTypeId() == 'user') {
+    $uid = $entity->id();
+
+    $node = Node::create(['type' => 'author_page']);
+    $node->set('title', 'My author page');
+    $node->set('uid', $uid);
+    $node->status = 1;
+    $node->enforceIsNew();
+    $node->save();
+  }
+}
+
