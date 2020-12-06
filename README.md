@@ -2,7 +2,11 @@
 
 Drupal module containing Entity hooks used in the SFU's Summit Insitutional Repository.
 
-## Current maintainer
+## Configuration
+
+There is none.
+
+## Mmaintainer
 
 * [Mark Jordan](https://github.com/mjordan)
 
