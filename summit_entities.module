@@ -6,11 +6,12 @@ use Drupal\node\Entity\Node;
  * Implements hook_entity_presave().
  */
 function summit_entities_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
-  // Split the term name (i.e., an author's name) and populate the appropriate fields
-  // in the term entity.
+  // Split the term name (i.e., an author's name) in a very simplistic way
+  // and populate the appropriate fields in the term entity.
   if ($entity->getEntityTypeId() == 'taxonomy_term' && $entity->bundle() == 'author') {
-    $entity->set('field_given_name', 'i am a given name');
-    $entity->set('field_last_name', 'i am a last name');
+    list($last_name, $given_name) = explode(',', $entity->getName());
+    $entity->set('field_given_name', trim($given_name));
+    $entity->set('field_last_name', trim($last_name));
   }
 }
 
@@ -19,15 +20,12 @@ function summit_entities_entity_presave(Drupal\Core\Entity\EntityInterface $enti
  */
 function summit_entities_entity_insert(Drupal\Core\Entity\EntityInterface $entity) {
   // Create an author page, assigning ownership to the new user.
+  // Defaults on this content type should be set to not publish, not promote.
   if ($entity->getEntityTypeId() == 'user') {
     $uid = $entity->id();
-
     $node = Node::create(['type' => 'author_page']);
     $node->set('title', 'Enter name in firstname lastname format');
     $node->set('uid', $uid);
-    // We may not need this field since the author owns the node.
-    // $node->set('field_summit_user_account', $uid);
-    $node->status = 0;
     $node->enforceIsNew();
     $node->save();
   }
